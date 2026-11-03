@@ -2,7 +2,6 @@ package internal
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -89,11 +88,8 @@ func (c *AsanaAPIClient) fetchUsersPage(ctx context.Context, limit int, offset s
 	}
 
 	var result usersPage
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		if ctx.Err() != nil {
-			return usersPage{}, ctx.Err()
-		}
-		return usersPage{}, fmt.Errorf("decode users: %w", err)
+	if err := decodeAPIResponse(ctx, "users", resp.Body, &result); err != nil {
+		return usersPage{}, err
 	}
 
 	c.logger.DebugContext(ctx, "Fetched users page",

@@ -2,7 +2,6 @@ package internal
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -89,11 +88,8 @@ func (c *AsanaAPIClient) fetchProjectsPage(ctx context.Context, limit int, offse
 	}
 
 	var result projectsPage
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		if ctx.Err() != nil {
-			return projectsPage{}, ctx.Err()
-		}
-		return projectsPage{}, fmt.Errorf("decode projects: %w", err)
+	if err := decodeAPIResponse(ctx, "projects", resp.Body, &result); err != nil {
+		return projectsPage{}, err
 	}
 
 	c.logger.DebugContext(ctx, "Fetched projects page",
