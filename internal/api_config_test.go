@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 )
 
@@ -41,7 +42,11 @@ func TestConfiguredHostAndWorkspace(t *testing.T) {
 		if r.URL.Path != "/custom/api/projects" && r.URL.Path != "/custom/api/users" {
 			t.Errorf("unexpected path %q", r.URL.Path)
 		}
-		if r.URL.Query().Get("workspace") != "workspace +/&" || r.URL.Query().Get("limit") != "100" {
+		limit := projectsPageLimit
+		if r.URL.Path == "/custom/api/users" {
+			limit = usersPageLimit
+		}
+		if r.URL.Query().Get("workspace") != "workspace +/&" || r.URL.Query().Get("limit") != strconv.Itoa(limit) {
 			t.Errorf("unexpected query %q", r.URL.RawQuery)
 		}
 		if r.Header.Get("Authorization") != "Bearer test-token" {

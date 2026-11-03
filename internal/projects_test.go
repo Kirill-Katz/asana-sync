@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"reflect"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -47,7 +48,7 @@ func TestGetProjects(t *testing.T) {
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				if r.Method != http.MethodGet || r.URL.Path != "/api/1.0/projects" || r.URL.Query().Get("limit") != "100" || r.URL.Query().Get("workspace") != testWorkspaceID {
+				if r.Method != http.MethodGet || r.URL.Path != "/api/1.0/projects" || r.URL.Query().Get("limit") != strconv.Itoa(projectsPageLimit) || r.URL.Query().Get("workspace") != testWorkspaceID {
 					t.Errorf("unexpected request: %s %s", r.Method, r.URL.RequestURI())
 				}
 				if r.Header.Get("Authorization") != "Bearer test-token" {

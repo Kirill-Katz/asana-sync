@@ -9,6 +9,8 @@ import (
 	"strconv"
 )
 
+const usersPageLimit = 100
+
 // User is a compact user record returned by Asana.
 type User struct {
 	GID  string `json:"gid"`
@@ -25,12 +27,11 @@ type usersPage struct {
 // GetUsers fetches all pages accessible to the authenticated user.
 // It returns no partial results if any page fails.
 func (c *AsanaAPIClient) GetUsers(ctx context.Context) ([]User, error) {
-	const limit = 100
 	var offset string
 	users := []User{}
 	seen := map[string]bool{"": true}
 	for {
-		page, err := c.fetchUsersPageWithRetries(ctx, limit, offset)
+		page, err := c.fetchUsersPageWithRetries(ctx, usersPageLimit, offset)
 		if err != nil {
 			return nil, err
 		}

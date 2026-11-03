@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"reflect"
+	"strconv"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -43,7 +44,7 @@ func TestGetUsersPaginationAndRetry(t *testing.T) {
 	var attempts atomic.Int32
 	client := newUsersTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		attempt := attempts.Add(1)
-		if r.Method != http.MethodGet || r.URL.Path != "/api/1.0/users" || r.URL.Query().Get("limit") != "100" || r.URL.Query().Get("workspace") != testWorkspaceID {
+		if r.Method != http.MethodGet || r.URL.Path != "/api/1.0/users" || r.URL.Query().Get("limit") != strconv.Itoa(usersPageLimit) || r.URL.Query().Get("workspace") != testWorkspaceID {
 			t.Errorf("unexpected request: %s %s", r.Method, r.URL)
 		}
 		if r.Header.Get("Authorization") != "Bearer test-token" || r.Header.Get("Accept") != "application/json" {

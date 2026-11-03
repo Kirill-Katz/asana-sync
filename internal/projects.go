@@ -9,6 +9,8 @@ import (
 	"strconv"
 )
 
+const projectsPageLimit = 100
+
 // Project is a compact project record returned by Asana.
 type Project struct {
 	GID  string `json:"gid"`
@@ -25,12 +27,11 @@ type projectsPage struct {
 // GetProjects fetches all pages accessible to the authenticated user.
 // It returns no partial results if any page fails.
 func (c *AsanaAPIClient) GetProjects(ctx context.Context) ([]Project, error) {
-	const limit = 100
 	var offset string
 	projects := []Project{}
 	seen := map[string]bool{"": true}
 	for {
-		page, err := c.fetchProjectsPageWithRetries(ctx, limit, offset)
+		page, err := c.fetchProjectsPageWithRetries(ctx, projectsPageLimit, offset)
 		if err != nil {
 			return nil, err
 		}

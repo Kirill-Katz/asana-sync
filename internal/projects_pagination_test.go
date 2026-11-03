@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"reflect"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -28,7 +29,7 @@ func TestGetProjectsPagination(t *testing.T) {
 			attempts := 0
 			client, err := NewAsanaAPIClient(&http.Client{Transport: roundTripFunc(func(req *http.Request) (*http.Response, error) {
 				attempts++
-				if req.URL.Query().Get("limit") != "100" || req.URL.Query().Get("workspace") != testWorkspaceID {
+				if req.URL.Query().Get("limit") != strconv.Itoa(projectsPageLimit) || req.URL.Query().Get("workspace") != testWorkspaceID {
 					t.Error("missing page size")
 				}
 				body := tc.lastBody
